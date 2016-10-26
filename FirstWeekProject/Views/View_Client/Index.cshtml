@@ -1,0 +1,52 @@
+﻿@model IEnumerable<FirstWeekProject.Models.View_Client>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+
+<form action="">
+    <input type="search" name="keyword" placeholder="Bank name"/>
+    <input type="submit" value="搜尋" /> 
+</form>
+
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.客戶名稱)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ClientNum)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.BankNum)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model)
+{
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.客戶名稱)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ClientNum)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.BankNum)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id = item.客戶名稱 }) |
+            @Html.ActionLink("Details", "Details", new { id = item.客戶名稱 }) |
+            @Html.ActionLink("Delete", "Delete", new { id = item.客戶名稱 })
+        </td>
+    </tr>
+}
+
+</table>

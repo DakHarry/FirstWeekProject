@@ -26,6 +26,7 @@
           <Property Name="傳真" Type="nvarchar" MaxLength="50" />
           <Property Name="地址" Type="nvarchar" MaxLength="100" />
           <Property Name="Email" Type="nvarchar" MaxLength="250" />
+          <Property Name="IsDelete" Type="bit" />
         </EntityType>
         <EntityType Name="客戶銀行資訊">
           <Key>
@@ -38,6 +39,7 @@
           <Property Name="分行代碼" Type="int" />
           <Property Name="帳戶名稱" Type="nvarchar" MaxLength="50" Nullable="false" />
           <Property Name="帳戶號碼" Type="nvarchar" MaxLength="20" Nullable="false" />
+          <Property Name="IsDelete" Type="bit" />
         </EntityType>
         <EntityType Name="客戶聯絡人">
           <Key>
@@ -50,6 +52,17 @@
           <Property Name="Email" Type="nvarchar" MaxLength="250" Nullable="false" />
           <Property Name="手機" Type="nvarchar" MaxLength="50" />
           <Property Name="電話" Type="nvarchar" MaxLength="50" />
+          <Property Name="IsDelete" Type="bit" />
+        </EntityType>
+        <!--產生期間發現錯誤:
+警告 6002: 資料表/檢視 'C:\FIRSTWEEKPROJECT\FIRSTWEEKPROJECT\APP_DATA\客戶資料.MDF.dbo.View_Client' 未定義主索引鍵。已推斷此索引鍵，並將定義建立成唯讀的資料表/檢視。-->
+        <EntityType Name="View_Client">
+          <Key>
+            <PropertyRef Name="客戶名稱" />
+          </Key>
+          <Property Name="客戶名稱" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="ClientNum" Type="int" />
+          <Property Name="BankNum" Type="int" />
         </EntityType>
         <Association Name="FK_客戶銀行資訊_客戶資料">
           <End Role="客戶資料" Type="Self.客戶資料" Multiplicity="1" />
@@ -80,6 +93,13 @@
           <EntitySet Name="客戶資料" EntityType="Self.客戶資料" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="客戶銀行資訊" EntityType="Self.客戶銀行資訊" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="客戶聯絡人" EntityType="Self.客戶聯絡人" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="View_Client" EntityType="Self.View_Client" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [View_Client].[客戶名稱] AS [客戶名稱], 
+    [View_Client].[ClientNum] AS [ClientNum], 
+    [View_Client].[BankNum] AS [BankNum]
+    FROM [dbo].[View_Client] AS [View_Client]</DefiningQuery>
+          </EntitySet>
           <AssociationSet Name="FK_客戶銀行資訊_客戶資料" Association="Self.FK_客戶銀行資訊_客戶資料">
             <End Role="客戶資料" EntitySet="客戶資料" />
             <End Role="客戶銀行資訊" EntitySet="客戶銀行資訊" />
@@ -106,6 +126,7 @@
           <Property Name="Email" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="客戶銀行資訊" Relationship="客戶資料Model.FK_客戶銀行資訊_客戶資料" FromRole="客戶資料" ToRole="客戶銀行資訊" />
           <NavigationProperty Name="客戶聯絡人" Relationship="客戶資料Model.FK_客戶聯絡人_客戶資料" FromRole="客戶資料" ToRole="客戶聯絡人" />
+          <Property Name="IsDelete" Type="Boolean" />
         </EntityType>
         <EntityContainer Name="客戶資料Entities" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="客戶資料" EntityType="Self.客戶資料" />
@@ -120,6 +141,7 @@
             <End Role="客戶資料" EntitySet="客戶資料" />
             <End Role="客戶聯絡人" EntitySet="客戶聯絡人" />
           </AssociationSet>
+          <EntitySet Name="View_Client" EntityType="客戶資料Model.View_Client" />
         </EntityContainer>
         <EntityType Name="sysdiagrams">
           <Key>
@@ -143,6 +165,7 @@
           <Property Name="帳戶名稱" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="帳戶號碼" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="客戶資料" Relationship="客戶資料Model.FK_客戶銀行資訊_客戶資料" FromRole="客戶銀行資訊" ToRole="客戶資料" />
+          <Property Name="IsDelete" Type="Boolean" />
         </EntityType>
         <EntityType Name="客戶聯絡人">
           <Key>
@@ -156,6 +179,7 @@
           <Property Name="手機" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="電話" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="客戶資料" Relationship="客戶資料Model.FK_客戶聯絡人_客戶資料" FromRole="客戶聯絡人" ToRole="客戶資料" />
+          <Property Name="IsDelete" Type="Boolean" />
         </EntityType>
         <Association Name="FK_客戶銀行資訊_客戶資料">
           <End Type="客戶資料Model.客戶資料" Role="客戶資料" Multiplicity="1" />
@@ -181,6 +205,14 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="View_Client">
+          <Key>
+            <PropertyRef Name="客戶名稱" />
+          </Key>
+          <Property Name="客戶名稱" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="ClientNum" Type="Int32" />
+          <Property Name="BankNum" Type="Int32" />
+        </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -190,6 +222,7 @@
           <EntitySetMapping Name="客戶資料">
             <EntityTypeMapping TypeName="客戶資料Model.客戶資料">
               <MappingFragment StoreEntitySet="客戶資料">
+                <ScalarProperty Name="IsDelete" ColumnName="IsDelete" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="客戶名稱" ColumnName="客戶名稱" />
                 <ScalarProperty Name="統一編號" ColumnName="統一編號" />
@@ -214,6 +247,7 @@
           <EntitySetMapping Name="客戶銀行資訊">
             <EntityTypeMapping TypeName="客戶資料Model.客戶銀行資訊">
               <MappingFragment StoreEntitySet="客戶銀行資訊">
+                <ScalarProperty Name="IsDelete" ColumnName="IsDelete" />
                 <ScalarProperty Name="帳戶號碼" ColumnName="帳戶號碼" />
                 <ScalarProperty Name="帳戶名稱" ColumnName="帳戶名稱" />
                 <ScalarProperty Name="分行代碼" ColumnName="分行代碼" />
@@ -227,6 +261,7 @@
           <EntitySetMapping Name="客戶聯絡人">
             <EntityTypeMapping TypeName="客戶資料Model.客戶聯絡人">
               <MappingFragment StoreEntitySet="客戶聯絡人">
+                <ScalarProperty Name="IsDelete" ColumnName="IsDelete" />
                 <ScalarProperty Name="電話" ColumnName="電話" />
                 <ScalarProperty Name="手機" ColumnName="手機" />
                 <ScalarProperty Name="Email" ColumnName="Email" />
@@ -234,6 +269,15 @@
                 <ScalarProperty Name="職稱" ColumnName="職稱" />
                 <ScalarProperty Name="客戶Id" ColumnName="客戶Id" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="View_Client">
+            <EntityTypeMapping TypeName="客戶資料Model.View_Client">
+              <MappingFragment StoreEntitySet="View_Client">
+                <ScalarProperty Name="BankNum" ColumnName="BankNum" />
+                <ScalarProperty Name="ClientNum" ColumnName="ClientNum" />
+                <ScalarProperty Name="客戶名稱" ColumnName="客戶名稱" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

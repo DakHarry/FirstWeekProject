@@ -11,6 +11,7 @@ namespace FirstWeekProject.Models
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.ComponentModel.DataAnnotations;
 
     public partial class 客戶資料
@@ -21,27 +22,29 @@ namespace FirstWeekProject.Models
             this.客戶銀行資訊 = new HashSet<客戶銀行資訊>();
             this.客戶聯絡人 = new HashSet<客戶聯絡人>();
         }
+
         [Key]
         public int Id { get; set; }
-        [Display(Name = "客戶名稱")]
-        [Required(ErrorMessage ="此欄位請勿空白!")]
+        [Required]
+
         public string 客戶名稱 { get; set; }
-        [Display(Name = "統一編號")]
-        [Required(ErrorMessage = "此欄位請勿空白!")]
+        [Required]
+
         public string 統一編號 { get; set; }
-        [Display(Name = "電話")]
-        [Required(ErrorMessage = "此欄位請勿空白!")]
+        [DataType(DataType.PhoneNumber)]
+        [Required]
         public string 電話 { get; set; }
-        [Display(Name = "傳真")]
-        [Required(ErrorMessage = "此欄位請勿空白!")]
+        [Required]
         public string 傳真 { get; set; }
-        [Display(Name = "地址")]
-        [Required(ErrorMessage = "此欄位請勿空白!")]
+        [Required]
+
         public string 地址 { get; set; }
-        [Display(Name = "Email")]
-        [Required(ErrorMessage = "此欄位請勿空白!")]
+        [Required]
+        [DataType(DataType.EmailAddress)]
         public string Email { get; set; }
-    
+        [DisplayName("刪除")]
+        public Nullable<bool> IsDelete { get; set; }
+
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<客戶銀行資訊> 客戶銀行資訊 { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

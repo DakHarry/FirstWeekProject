@@ -29,5 +29,6 @@ namespace FirstWeekProject.Models
         public virtual DbSet<sysdiagrams> sysdiagrams { get; set; }
         public virtual DbSet<客戶銀行資訊> 客戶銀行資訊 { get; set; }
         public virtual DbSet<客戶聯絡人> 客戶聯絡人 { get; set; }
+        public virtual DbSet<View_Client> View_Client { get; set; }
     }
 }

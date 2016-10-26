@@ -9,10 +9,6 @@
 <p>
     @Html.ActionLink("Create New", "Create")
 </p>
-<form action="">
-    <input type="search" name="keyword"  />
-    <input type="submit" value="搜尋" />
-</form>
 <table class="table">
     <tr>
         <th>
@@ -32,9 +28,6 @@
         </th>
         <th>
             @Html.DisplayNameFor(model => model.客戶資料.客戶名稱)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.IsDelete)
         </th>
         <th></th>
     </tr>
@@ -58,9 +51,6 @@
         </td>
         <td>
             @Html.DisplayFor(modelItem => item.客戶資料.客戶名稱)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.IsDelete)
         </td>
         <td>
             @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |

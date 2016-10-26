@@ -11,26 +11,34 @@ namespace FirstWeekProject.Models
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.ComponentModel.DataAnnotations;
 
     public partial class 客戶聯絡人
     {
-        [Required]
         [Key]
         public int Id { get; set; }
         [Required]
+
         public int 客戶Id { get; set; }
         [Required]
+
         public string 職稱 { get; set; }
         [Required]
+
         public string 姓名 { get; set; }
         [Required]
+        [DataType(DataType.EmailAddress)]
         public string Email { get; set; }
         [Required]
-        [RegularExpression(@"\d{4}-\d{6",ErrorMessage = "格式需為:0911-111111")]
+        [RegularExpression(@"^\d{4}-\d{6}$")]
         public string 手機 { get; set; }
         [Required]
+        [RegularExpression(@"^\(\d{2}\)\d[0-9]+$")]
         public string 電話 { get; set; }
+        [DisplayName("刪除")]
+
+        public Nullable<bool> IsDelete { get; set; }
     
         public virtual 客戶資料 客戶資料 { get; set; }
     }
