@@ -16,7 +16,7 @@ namespace FirstWeekProject.Controllers
         // GET: 客戶聯絡人
         public ActionResult Index(string keyword)
         {
-            var data = db.客戶聯絡人.Include(w => w.客戶資料 ).Where(w =>w.IsDelete == false).ToList();
+            var data = db.客戶聯絡人.Include(w => w.客戶資料 ).ToList();
             if (!String.IsNullOrEmpty(keyword))
             {
                 data = db.客戶聯絡人.Where(w => w.姓名.Contains(keyword)).ToList();
@@ -43,7 +43,9 @@ namespace FirstWeekProject.Controllers
                 return RedirectToAction("Index");
 
             }
-               return RedirectToAction("Create");
+            ViewBag.客戶Id = new SelectList(db.客戶資料, "Id", "客戶名稱", data.客戶Id);
+            return View(data);
+           // return RedirectToAction("Create");
            // List<SelectListItem> items = new List<SelectListItem>();
             //if(data.客戶Id != null)
             //{
