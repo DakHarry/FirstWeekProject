@@ -12,17 +12,31 @@ namespace FirstWeekProject.Controllers
 {
     public class 客戶資料Controller : Controller
     {
-        private 客戶資料Entities db = new 客戶資料Entities();
+       // private 客戶資料Entities db = new 客戶資料Entities();
+        客戶資料Repository repo =  RepositoryHelper.Get客戶資料Repository();
 
         // GET: 客戶資料
-        public ActionResult Index(string keyword)
+        public ActionResult Index(string keyword, string ClientData)
         {
-            var data = db.客戶資料.Where(w => w.IsDelete == false).ToList();
+            
+            var data = repo.Where(w => w.IsDelete == false);
 
             if (!String.IsNullOrEmpty(keyword))
             {
-                data = db.客戶資料.Where(w => w.客戶名稱.Contains(keyword)).ToList();
+                data = repo.Where(w => w.客戶名稱.Contains(keyword));
             }
+
+            if (!String.IsNullOrEmpty(ClientData))
+            {
+                 data = data.Where(o => o.客戶名稱.Equals(ClientData));
+            }
+            var options = (from p in repo.All()
+                           select
+       p.客戶名稱).Distinct().OrderBy(p => p).ToList();
+            //關聯下拉是選單
+            ViewBag.ClientData = new SelectList(options);
+
+
             return View(data);
         }
 
@@ -33,7 +47,7 @@ namespace FirstWeekProject.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            客戶資料 客戶資料 = db.客戶資料.Find(id);
+            客戶資料 客戶資料 = repo.Find(id.Value);
             
             if (客戶資料 == null)
             {
@@ -57,8 +71,10 @@ namespace FirstWeekProject.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.客戶資料.Add(客戶資料);
-                db.SaveChanges();
+                客戶資料.IsDelete = false;
+                repo.Add(客戶資料);
+                
+                repo.UnitOfWork.Commit();
                 return RedirectToAction("Index");
             }
 
@@ -72,7 +88,7 @@ namespace FirstWeekProject.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            客戶資料 客戶資料 = db.客戶資料.Find(id);
+            客戶資料 客戶資料 = repo.Find(id.Value);
             if (客戶資料 == null)
             {
                 return HttpNotFound();
@@ -89,8 +105,8 @@ namespace FirstWeekProject.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.Entry(客戶資料).State = EntityState.Modified;
-                db.SaveChanges();
+                repo.UnitOfWork.Context.Entry(客戶資料).State = EntityState.Modified;
+                repo.UnitOfWork.Commit();
                 return RedirectToAction("Index");
             }
             return View(客戶資料);
@@ -103,12 +119,15 @@ namespace FirstWeekProject.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            客戶資料 客戶資料 = db.客戶資料.Find(id);
+            客戶資料 客戶資料 = repo.Find(id.Value);
             if (客戶資料 == null)
             {
                 return HttpNotFound();
             }
-            return View(客戶資料);
+            repo.Delete(id.Value);
+            repo.UnitOfWork.Commit();
+            return RedirectToAction("Index");
+
         }
 
         // POST: 客戶資料/Delete/5
@@ -116,15 +135,16 @@ namespace FirstWeekProject.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            客戶資料 data = db.客戶資料.Find(id);
+            客戶資料 data = repo.Find(id);
             if (data != null)
             {
-                data.IsDelete = true;
-                db.SaveChanges();
+                repo.Delete(id);
+                //data.IsDelete = true;
+                repo.UnitOfWork.Commit();
              return   RedirectToAction("Index");
             }
-            //db.客戶資料.Remove(客戶資料);
-            //db.SaveChanges();
+            //repo.Remove(客戶資料);
+            //repo.UnitOfWork.Commit();
             return RedirectToAction("Index");
         }
 
@@ -132,7 +152,7 @@ namespace FirstWeekProject.Controllers
         {
             if (disposing)
             {
-                db.Dispose();
+                repo.UnitOfWork.Context.Dispose();
             }
             base.Dispose(disposing);
         }

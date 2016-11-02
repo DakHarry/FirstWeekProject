@@ -13,22 +13,22 @@ namespace FirstWeekProject.Controllers
     public class 客戶銀行資訊Controller : Controller
     {
         private 客戶資料Entities db = new 客戶資料Entities();
-
+        private 客戶銀行資訊Repository repo = RepositoryHelper.Get客戶銀行資訊Repository();
         // GET: 客戶銀行資訊
         public ActionResult Index(string keyword)
         {
-            var 客戶銀行資訊 = db.客戶銀行資訊.Include(客 => 客.客戶資料);
-            客戶銀行資訊 = 客戶銀行資訊.Where(w => w.IsDelete == false);
+            var 客戶銀行資訊 = repo.All().Include(客 => 客.客戶資料);
+            客戶銀行資訊 = 客戶銀行資訊.Where(w => w.IsDelete != true);
             if (!String.IsNullOrEmpty(keyword))
             {
-                客戶銀行資訊 = db.客戶銀行資訊.Where(w => w.銀行名稱.Contains(keyword));
+                客戶銀行資訊 = 客戶銀行資訊.Where(w => w.銀行名稱.Contains(keyword));
             }
             return View(客戶銀行資訊.ToList());
         }
         //[HttpPost]
         //public ActionResult Index()
         //{
-        //    var data = db.客戶銀行資訊.Include(客 => 客.客戶資料);
+        //    var data = repo.Include(客 => 客.客戶資料);
 
         //    return View(data);
         //}
@@ -40,7 +40,7 @@ namespace FirstWeekProject.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            客戶銀行資訊 客戶銀行資訊 = db.客戶銀行資訊.Find(id);
+            客戶銀行資訊 客戶銀行資訊 = repo.Find(id.Value);
             if (客戶銀行資訊 == null)
             {
                 return HttpNotFound();
@@ -62,10 +62,12 @@ namespace FirstWeekProject.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create([Bind(Include = "Id,客戶Id,銀行名稱,銀行代碼,分行代碼,帳戶名稱,帳戶號碼")] 客戶銀行資訊 客戶銀行資訊)
         {
+            客戶銀行資訊.IsDelete = false;
             if (ModelState.IsValid)
             {
-                db.客戶銀行資訊.Add(客戶銀行資訊);
-                db.SaveChanges();
+                repo.Add(客戶銀行資訊);
+                
+                repo.UnitOfWork.Commit();
                 return RedirectToAction("Index");
             }
 
@@ -80,7 +82,7 @@ namespace FirstWeekProject.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            客戶銀行資訊 客戶銀行資訊 = db.客戶銀行資訊.Find(id);
+            客戶銀行資訊 客戶銀行資訊 = repo.Find(id.Value);
             if (客戶銀行資訊 == null)
             {
                 return HttpNotFound();
@@ -98,8 +100,8 @@ namespace FirstWeekProject.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.Entry(客戶銀行資訊).State = EntityState.Modified;
-                db.SaveChanges();
+                repo.UnitOfWork.Context.Entry(客戶銀行資訊).State = EntityState.Modified;
+                repo.UnitOfWork.Commit();
                 return RedirectToAction("Index");
             }
             ViewBag.客戶Id = new SelectList(db.客戶資料, "Id", "客戶名稱", 客戶銀行資訊.客戶Id);
@@ -113,12 +115,12 @@ namespace FirstWeekProject.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            客戶銀行資訊 data = db.客戶銀行資訊.Find(id);
+            客戶銀行資訊 data = repo.Find(id.Value);
 
             if (data != null)
             {
-                data.IsDelete = true;
-                db.SaveChanges();
+                repo.Delete(id.Value);
+                repo.UnitOfWork.Commit();
            return     RedirectToAction("Index");
             }
           return  RedirectToAction("Index");
@@ -130,9 +132,10 @@ namespace FirstWeekProject.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            客戶銀行資訊 客戶銀行資訊 = db.客戶銀行資訊.Find(id);
-            db.客戶銀行資訊.Remove(客戶銀行資訊);
-            db.SaveChanges();
+            客戶銀行資訊 客戶銀行資訊 = repo.Find(id);
+            客戶銀行資訊.IsDelete = true;
+            //repo.Remove(客戶銀行資訊);
+            repo.UnitOfWork.Commit();
             return RedirectToAction("Index");
         }
 

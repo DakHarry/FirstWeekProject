@@ -4,13 +4,14 @@
     ViewBag.Title = "Index";
 }
 
-<h2>Index</h2>
+<h2>客戶資料</h2>
 
 <p>
     @Html.ActionLink("Create New", "Create")
 </p>
 <form action="">
     <input type="search" name="keyword"  />
+    @Html.DropDownList("ClientData", "客戶分類")
     <input type="submit" value="搜尋" />
 </form>
 <table class="table">
@@ -35,6 +36,9 @@
         </th>
         <th>
             @Html.DisplayNameFor(model => model.IsDelete)
+        </th>
+        <th>
+            @Html.DropDownList("ClientData", "客戶分類")
         </th>
         <th></th>
     </tr>
@@ -61,6 +65,9 @@
         </td>
         <td>
             @Html.DisplayFor(modelItem => item.IsDelete)
+        </td>
+        <td>
+
         </td>
         <td>
             @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |

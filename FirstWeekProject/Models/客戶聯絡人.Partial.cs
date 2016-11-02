@@ -15,11 +15,12 @@ namespace FirstWeekProject.Models
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             var db = new 客戶資料Entities();
+            var repo = RepositoryHelper.Get客戶聯絡人Repository();
 
           //  var data= db.客戶聯絡人.Where(w => w.姓名.Equals(this.姓名)).Where(w => w.Email.Equals(this.Email));
             if(this.Id == 0)
             {
-                if(db.客戶聯絡人.Where(p => p.客戶Id == this.客戶Id && p.Email == this.Email).Any())
+                if(repo.Where(p => p.客戶Id == this.客戶Id && p.Email == this.Email).Any())
                 {
 
                     yield return new ValidationResult("該信箱已註冊!", new string[] { "Email" });
@@ -28,7 +29,7 @@ namespace FirstWeekProject.Models
             }
             else
             {
-                if (db.客戶聯絡人.Where(p => p.客戶Id == this.客戶Id && p.Email == this.Email).Any())
+                if (repo.Where(p => p.客戶Id == this.客戶Id && p.Email == this.Email).Any())
                 {
 
                     yield return new ValidationResult("該信箱已註冊!",

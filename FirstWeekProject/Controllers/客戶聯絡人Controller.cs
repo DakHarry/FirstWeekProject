@@ -11,24 +11,25 @@ namespace FirstWeekProject.Controllers
 {
     public class 客戶聯絡人Controller : Controller
     {
-        private 客戶資料Entities db = new 客戶資料Entities();
-
+       // private 客戶資料Entities db = new 客戶資料Entities();
+        private 客戶聯絡人Repository repo = RepositoryHelper.Get客戶聯絡人Repository();
         // GET: 客戶聯絡人
-        public ActionResult Index(string keyword)
+        public ActionResult Index(string keyword,string ClientData)
         {
-            var data = db.客戶聯絡人.Include(w => w.客戶資料 ).ToList();
+            //var data = repo.Include(w => w.客戶資料 ).ToList();
+            var data = repo.All().Include(w =>w.客戶資料).ToList();
             if (!String.IsNullOrEmpty(keyword))
             {
-                data = db.客戶聯絡人.Where(w => w.姓名.Contains(keyword)).ToList();
+                data = data.Where(w => w.姓名.Contains(keyword)).ToList();
             }
-            //關聯下拉是選單
-                   
+
             return View(data);
         }
 
         public ActionResult Create()
         {
-            ViewBag.客戶Id = new SelectList(db.客戶資料, "Id", "客戶名稱");
+            
+            ViewBag.客戶Id = new SelectList(repo.Get客戶資料().客戶資料, "Id", "客戶名稱");
             return View();
         }
         [HttpPost]
@@ -37,13 +38,14 @@ namespace FirstWeekProject.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.客戶聯絡人.Add(data);
-                db.SaveChanges();
+                repo.Add(data);
+                
+                repo.UnitOfWork.Commit();
 
                 return RedirectToAction("Index");
 
             }
-            ViewBag.客戶Id = new SelectList(db.客戶資料, "Id", "客戶名稱", data.客戶Id);
+            ViewBag.客戶Id = new SelectList(repo.Get客戶資料().客戶資料, "Id", "客戶名稱", data.客戶Id);
             return View(data);
            // return RedirectToAction("Create");
            // List<SelectListItem> items = new List<SelectListItem>();
@@ -64,19 +66,19 @@ namespace FirstWeekProject.Controllers
         public ActionResult Edit(int? id)
         {
 
-          //  var data = db.客戶聯絡人.Where(w => w.客戶Id == id);
+          //  var data = repo.Where(w => w.客戶Id == id);
 
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
             //抓一筆可以用Find
-            客戶聯絡人 data = db.客戶聯絡人.Find(id);
+            客戶聯絡人 data = repo.Find(id.Value);
             if (data == null)
             {
                 return HttpNotFound();
             }
-            ViewBag.客戶Id = new SelectList(db.客戶資料, "Id", "客戶名稱", data.客戶Id);
+            ViewBag.客戶Id = new SelectList(repo.Get客戶資料().客戶資料, "Id", "客戶名稱", data.客戶Id);
             return View(data);
         }
         [HttpPost]
@@ -84,11 +86,11 @@ namespace FirstWeekProject.Controllers
         public ActionResult Edit([Bind(Include = "Id,客戶Id,職稱,姓名,Email,手機,電話")] 客戶聯絡人 data) { 
             if (ModelState.IsValid)
             {
-                db.Entry(data).State = EntityState.Modified;
-                db.SaveChanges();
+                repo.UnitOfWork.Context.Entry(data).State = EntityState.Modified;
+                repo.UnitOfWork.Commit();
                 return RedirectToAction("Index");
             }
-            ViewBag.客戶Id = new SelectList(db.客戶資料, "Id", "客戶名稱", data.客戶Id);
+            ViewBag.客戶Id = new SelectList(repo.Get客戶資料().客戶資料, "Id", "客戶名稱", data.客戶Id);
             return View(data);
         }
 
@@ -100,15 +102,16 @@ namespace FirstWeekProject.Controllers
 
             }
 
-            客戶聯絡人 data= db.客戶聯絡人.Find(id);
+            客戶聯絡人 data= repo.Find(id.Value);
             if (data != null)
             {
-                data.IsDelete = true;
-                db.SaveChanges();
-             return    RedirectToAction("Index");
+                // data.IsDelete = true;
+                repo.Delete(id.Value);
+                repo.UnitOfWork.Commit();
+             return RedirectToAction("Index");
             }
-            //db.客戶聯絡人.Remove(data);
-            //db.SaveChanges();
+            //repo.Remove(data);
+            //repo.UnitOfWork.Commit();
 
             return RedirectToAction("Index");
         }
@@ -119,7 +122,7 @@ namespace FirstWeekProject.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            客戶聯絡人 data = db.客戶聯絡人.Find(id);
+            客戶聯絡人 data = repo.Find(id.Value);
             if (data == null)
             {
                 return HttpNotFound();
